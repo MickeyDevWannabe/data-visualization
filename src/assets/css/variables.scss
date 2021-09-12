@@ -1,0 +1,19 @@
+.theme--dark.v-application {
+  background: #28243d !important;
+  color: #FFFFFF;
+  font-family: Inter,sans-serif;
+}
+.theme--dark.v-card {
+  background-color: #312d4b;
+  color: rgba(231,227,252,.87);
+}
+.theme--dark.v-list {
+  background-color: #312d4b;
+}
+
+.highcharts-axis-title,
+.highcharts-xaxis-labels text,
+.highcharts-yaxis-labels text,
+.highcharts-legend-item text {
+  fill: white !important;
+}
