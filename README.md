@@ -1,5 +1,10 @@
 # data-visualization
 
+Data visualization app made for monitoring of currency exchange rates.
+It enables users to view current top value currencies, check their value change
+over up to 30 day period and also have a look on other world currency rates
+that are viewable on top of the app page in a random manner. 
+
 ## Project setup
 ```
 npm install
