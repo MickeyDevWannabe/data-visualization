@@ -8,7 +8,6 @@
     :right="$vuetify.rtl"
     @input="val => $emit('update:is-drawer-open', val)"
   >
-    <!-- Navigation Header -->
     <div class="nav-header d-flex items-center pl-6 pt-5 pb-2">
       <v-icon color="primary">{{ icons.mdiCurrencyUsd }}</v-icon>
       <h2 class="app-title text--primary">
@@ -16,7 +15,6 @@
       </h2>
     </div>
 
-    <!-- Navigation Items -->
     <v-list
       expand
       shaped
@@ -26,12 +24,12 @@
         title="Dashboard"
         to="#"
         :icon="icons.mdiHomeOutline"
-      ></nav-menu-link>
+      />
       <nav-menu-link
         title="Account Settings"
         to="#"
         :icon="icons.mdiAccountCogOutline"
-      ></nav-menu-link>
+      />
       <nav-menu-group
         title="Pages"
         :icon="icons.mdiFileOutline"
@@ -40,12 +38,12 @@
           title="Login"
           to="#"
           target="_blank"
-        ></nav-menu-link>
+        />
         <nav-menu-link
           title="Register"
           to="#"
           target="_blank"
-        ></nav-menu-link>
+        />
       </nav-menu-group>
     </v-list>
   </v-navigation-drawer>

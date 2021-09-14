@@ -1,211 +1,118 @@
 <template>
   <v-container>
-    <v-row class="text-center">
-      <v-col class="mb-4">
-        <h1 class="display-2 font-weight-bold mb-3">
-          NBP data visualization
-        </h1>
-
-        <v-row>
-          <v-col class="ma-1">
-            <v-card
-              class="d-flex flex-column"
-              style="height: 100%;"
-            >
-              <v-card-title>Data period</v-card-title>
-              <v-card-text>
-                <multiline-text-card :items="getViewPeriod" />
-              </v-card-text>
-              <div>
-                <v-col>
-                  <v-text-field
-                    v-model="topCount"
-                    label="Last X data sets"
-                  />
-                </v-col>
-                <v-col>
-                  <v-btn
-                    color="primary"
-                    @click="fetchExchangeRates"
-                  >
-                    Get exchange rates for selected period
-                  </v-btn>
-                </v-col>
-                <v-col>
-                  <v-btn
-                    color="primary"
-                    @click="fetchExchangeRatesTopCount"
-                  >
-                    Get last {{ topCount }} data sets
-                  </v-btn>
-                </v-col>
-              </div>
-              <div class="align-end d-flex flex-grow-1 justify-center mb-3">
-                <datepicker-dialog
-                  :max="dayjs().format('YYYY-MM-DD')"
-                  :min="dayjs().subtract(93, 'day').format('YYYY-MM-DD')"
-                  range
-                  text="Change range"
-                  :value="viewPeriod"
-                  @change="viewPeriod = $event"
-                />
-              </div>
-            </v-card>
-          </v-col>
-          <v-col>
-            <Chart
-              :categories="['Currency']"
-              :series="prepareChartData(mappedData)"
-              title="Currency value"
-              y-axis-title="Avg. exchange rate"
-            />
-          </v-col>
-          <v-col cols="4">
-            <Chart
-              :categories="['Currency']"
-              :series="prepareChartData(topThreeCurrencies)"
-              title="Top 3 currencies"
-              y-axis-title="Avg. exchange rate"
-            />
-          </v-col>
-          <v-col cols="4">
-            <text-trend-card />
-<!--            <trend-->
-<!--              :data="[0, 2, 5, 9, 5, 10, 3, 5, 0, 0, 1, 8, 2, 9, 0]"-->
-<!--              :gradient="['#6fa8dc', '#42b983', '#2c3e50']"-->
-<!--              auto-draw-->
-<!--              smooth-->
-<!--            />-->
-          </v-col>
-        </v-row>
-
-        <v-row>
-          <v-col cols="4">
-            <text-card
-              :text="publicationDate"
-              title="Publication date"
-            />
-          </v-col>
-          <v-col cols="4">
-            <text-card
-              :label="highestValue ? highestValue.code : ''"
-              :loading="loading"
-              :text="highestValue ? highestValue.value : ''"
-              title="Highest value"
-            />
-          </v-col>
-          <v-col cols="4">
-            <multiline-text-card
-              avatar
-              :items="topThreeCurrencies"
-              :loading="loading"
-              title="Top 3 currencies"
-            />
-          </v-col>
-        </v-row>
-        <v-row>
-          <v-col cols="4">
-            <text-card
-              :text="datasetSize"
-              title="Dataset size"
-            />
-          </v-col>
-          <v-col cols="4">
-            <text-card
-              :label="lowestValue ? lowestValue.code : ''"
-              :loading="loading"
-              :text="lowestValue ? lowestValue.value : ''"
-              title="Lowest value"
-            />
-          </v-col>
-        </v-row>
-      </v-col>
-    </v-row>
+    <div>
+      <h1 class="ml-2 my-5">Market</h1>
+      <v-row class="mx-0 my-2">
+        <TextTrendCard
+          class="col-3 mr-2"
+          :is-upward-trend="isUpwardTrend(
+          prepareTrendValues(currencyLifetimeData, randomChartIndices[0]),
+        )"
+          :text="currencyLifetimeData[randomChartIndices[0]][0].code"
+          :values="prepareTrendValues(currencyLifetimeData, randomChartIndices[0])"
+        />
+        <TextTrendCard
+          class="col-3 mr-2"
+          :is-upward-trend="isUpwardTrend(
+          prepareTrendValues(currencyLifetimeData, randomChartIndices[1]),
+        )"
+          :text="currencyLifetimeData[randomChartIndices[1]][0].code"
+          :values="prepareTrendValues(currencyLifetimeData, randomChartIndices[1])"
+        />
+        <TextTrendCard
+          class="col-3 mr-2"
+          :is-upward-trend="isUpwardTrend(
+          prepareTrendValues(currencyLifetimeData, randomChartIndices[2]),
+        )"
+          :text="currencyLifetimeData[randomChartIndices[2]][0].code"
+          :values="prepareTrendValues(currencyLifetimeData, randomChartIndices[2])"
+        />
+      </v-row>
+    </div>
+    <div class="main-grid">
+      <div
+        class="d-none d-lg-block span-item"
+        style="position: relative;"
+      >
+        <div class="buttons-on-chart">
+          <v-btn @click="changeChartData(3)">3 days</v-btn>
+          <v-btn @click="changeChartData(6)">6 days</v-btn>
+          <v-btn @click="changeChartData(10)">10 days</v-btn>
+          <v-btn @click="changeChartData(15)">15 days</v-btn>
+          <v-btn @click="changeChartData(30)">30 days</v-btn>
+        </div>
+        <v-card
+          class="rounded-lg pa-2"
+          style="min-width: 800px;"
+        >
+          <google-chart :values="mappedChartData" />
+        </v-card>
+      </div>
+      <div>
+        <h2 class="ml-2 mb-5 mt-2">Top 3 currencies</h2>
+        <multiline-text-card
+          avatar
+          :items="topThreeCurrencies"
+        />
+      </div>
+      <div>
+        <h2 class="ml-2 mb-5 mt-2">Growth</h2>
+        <growth-card :items="topThreeCurrenciesGrowth" />
+      </div>
+    </div>
   </v-container>
 </template>
 
 <script>
-import dayjs from 'dayjs';
 import { NBP, TABLE_TYPES } from '../plugins/nbp';
-import Chart from './core/charts/Chart.vue';
-import DatepickerDialog from './layout/DatepickerDialog.vue';
+import GoogleChart from './core/charts/GoogleChart.vue';
+import GrowthCard from './core/cards/GrowthCard.vue';
 import MultilineTextCard from './core/cards/MultilineTextCard.vue';
-import TextCard from './core/cards/TextCard.vue';
 import TextTrendCard from './core/cards/TextTrendCard.vue';
 
 export default {
-  name: 'index',
+  name: 'new',
   components: {
-    Chart, DatepickerDialog, MultilineTextCard, TextCard, TextTrendCard,
+    GoogleChart, GrowthCard, MultilineTextCard, TextTrendCard,
   },
   data: () => ({
     currencyData: null,
-    goldData: null,
+    currencyLifetimeData: null,
     loading: false,
-    tableType: null,
-    topCount: 1,
-    viewPeriod: dayjs().format('YYYY-MM-DD'),
+    mappedChartData: [],
+    randomChartIndices: [0, 1, 2],
+    topCount: 10,
+    topThreeIndices: [],
   }),
-
-  created() {
-    this.tableType = TABLE_TYPES.A;
-  },
-
   mounted() {
     this.fetchExchangeRatesTopCount();
   },
-
   watch: {
-    viewPeriod(value) {
-      if (value.length > 1 && value[0] > value[1]) {
-        this.viewPeriod = value.reverse();
-      }
+    currencyData(value) {
+      if (!value) return;
+      this.setCurrencyLifetimeData(value);
+      this.setMappedChartData(value);
+      this.setTopThreeIndices(value);
     },
   },
-
+  created() {
+    setInterval(this.randomizeChartIndices, 5000);
+  },
   computed: {
-    getViewPeriod() {
-      let period = this.viewPeriod;
-      if (!Array.isArray(period)) period = [period];
-      const periodLabels = ['From', 'To'];
-      return period.map((item, index) => ({ code: periodLabels[index], value: item }));
-    },
-    dayjs() {
-      return dayjs;
-    },
     mappedData() {
       if (!this.currencyData) return [];
-      // if (Array.isArray(this.currencyData)) {
-      //   console.log('Currency data: ', this.currencyData);
-      //   this.currencyData.reduce((acc, curr) => {
-      //     console.log('Acc: ', acc);
-      //     console.log('Curr: ', curr);
-      //     console.log('Curr.rates: ', curr.rates);
-      //     const prep = this.prepareRatesOptions(curr.rates);
-      //     console.log('Prepd opts: ', prep);
-      //     return acc.push(this.prepareRatesOptions(curr.rates));
-      //   }, []);
-      // }
       const newestData = this.currencyData[this.currencyData.length - 1];
       const sorted = newestData.rates.sort((a, b) => a.code.localeCompare(b.code));
       return this.prepareRatesOptions(sorted);
     },
-    publicationDate() {
-      if (!this.currencyData) return null;
-      return this.currencyData[this.currencyData.length - 1].effectiveDate;
-    },
-    highestValue() {
-      if (!this.mappedData.length) return null;
-      return this.mappedData
-        .reduce((acc, curr) => (acc.value < curr.value ? curr : acc), this.mappedData[0]);
-    },
-    lowestValue() {
-      if (!this.mappedData.length) return null;
-      return this.mappedData
-        .reduce((acc, curr) => (acc.value > curr.value ? curr : acc), this.mappedData[0]);
-    },
-    datasetSize() {
-      return this.mappedData.length;
+    topThreeCurrenciesGrowth() {
+      return this.topThreeIndices.reduce((acc, curr) => {
+        const data = this.currencyLifetimeData;
+        const growth = (data[curr][0].mid / data[curr][data[curr].length - 1].mid) * 100;
+        const percentGrowth = (100 - growth).toFixed(2);
+        acc.push({ code: data[curr][0].code, value: percentGrowth });
+        return acc;
+      }, []);
     },
     topThreeCurrencies() {
       if (!this.mappedData.length) return [];
@@ -223,13 +130,80 @@ export default {
         .reverse();
     },
   },
-
   methods: {
-    prepareChartData(options) {
-      return options.map((obj) => ({
-        name: obj.code,
-        data: [obj.value],
-      }));
+    setTopThreeIndices(value) {
+      const names = value[0].rates
+        .sort((a, b) => a.code.localeCompare(b.code))
+        .map((obj) => obj.code);
+      this.topThreeIndices = this.topThreeCurrencies.reduce((acc, curr) => {
+        const index = names.indexOf(curr.code);
+        acc.push(index);
+        return acc;
+      }, []);
+    },
+    setMappedChartData(value) {
+      const dates = value.reduce((acc, curr) => {
+        acc.push(curr.effectiveDate);
+        return acc;
+      }, []);
+      const names = value[0].rates
+        .sort((a, b) => a.code.localeCompare(b.code))
+        .map((obj) => obj.code);
+      const sorted = value.reduce((acc, curr) => {
+        const localSorted = curr.rates.sort((a, b) => a.code.localeCompare(b.code));
+        acc.push(localSorted.map((ls) => ls.mid));
+        return acc;
+      }, []);
+
+      const indices = this.topThreeCurrencies.reduce((acc, curr) => {
+        const index = names.indexOf(curr.code);
+        acc.push(index);
+        return acc;
+      }, []);
+
+      const chartData = [
+        ['Date', names[indices[0]], names[indices[1]], names[indices[2]]],
+      ];
+      for (let i = 0; i < sorted.length; i += 1) {
+        const arr = [dates[i], sorted[i][indices[0]], sorted[i][indices[1]], sorted[i][indices[2]]];
+        chartData.push(arr);
+      }
+      this.mappedChartData = chartData;
+    },
+    setCurrencyLifetimeData(value) {
+      const mergeArray = [];
+      value.forEach((data, index) => {
+        const sortedArray = data.rates.sort((a, b) => a.code.localeCompare(b.code));
+        if (index === 0) {
+          mergeArray.push(sortedArray.map((obj) => [obj]));
+          return;
+        }
+        for (let i = 0; i < sortedArray.length; i += 1) {
+          mergeArray[0][i].push(sortedArray[i]);
+        }
+      });
+      // eslint-disable-next-line prefer-destructuring
+      this.currencyLifetimeData = mergeArray[0];
+      return null;
+    },
+    randomizeChartIndices() {
+      this.randomChartIndices = [
+        Math.floor(Math.random() * 35),
+        Math.floor(Math.random() * 35),
+        Math.floor(Math.random() * 35),
+      ];
+    },
+    async changeChartData(topCount) {
+      await this.fetchExchangeRatesTopCount(topCount);
+      this.randomizeChartIndices();
+      this.topCount = topCount;
+    },
+    isUpwardTrend(values) {
+      return values[values.length - 1] > values[values.length - 2];
+    },
+    prepareTrendValues(values, index) {
+      if (!values) return [];
+      return values[index].map((obj) => obj.mid);
     },
     prepareRatesOptions(options) {
       return options.map((obj) => ({
@@ -237,19 +211,10 @@ export default {
         value: obj.mid,
       }));
     },
-    async fetchExchangeRates() {
-      const nbp = new NBP();
-      const response = await nbp.exchangeRatesGeneralPeriod(
-        TABLE_TYPES.A,
-        this.viewPeriod[0],
-        this.viewPeriod.length > 1 ? this.viewPeriod[1] : this.viewPeriod[0],
-      );
-      this.handleResponse(response, 'currencyData');
-    },
-    async fetchExchangeRatesTopCount() {
+    async fetchExchangeRatesTopCount(topCount = 10) {
       const nbp = new NBP();
       this.loading = true;
-      const response = await nbp.exchangeRatesGeneralTopCount(TABLE_TYPES.A, 10);
+      const response = await nbp.exchangeRatesGeneralTopCount(TABLE_TYPES.A, topCount);
       this.loading = false;
       this.handleResponse(response, 'currencyData');
     },
@@ -264,3 +229,27 @@ export default {
   },
 };
 </script>
+<style scoped>
+  @media all and (max-width: 800px) {
+    .main-grid {
+      grid-template-columns: auto !important;
+    }
+  }
+  .main-grid {
+    display: grid;
+    grid-template-columns: auto auto;
+    grid-gap: 10px;
+  }
+  .span-item {
+    grid-row: 1 / span 2;
+  }
+  .buttons-on-chart {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    display: grid;
+    grid-template-columns: auto auto auto auto auto;
+    grid-gap: 10px;
+    z-index: 10;
+  }
+</style>

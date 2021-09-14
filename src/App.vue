@@ -2,15 +2,13 @@
   <v-app>
     <sidebar />
     <v-main>
-<!--      <Index />-->
-      <New />
+      <Index />
     </v-main>
   </v-app>
 </template>
 
 <script>
-// import Index from './components/index.vue';
-import New from './components/new.vue';
+import Index from './components/index.vue';
 import './assets/css/variables.scss';
 import Sidebar from './components/layout/nav/Sidebar.vue';
 
@@ -19,8 +17,7 @@ export default {
 
   components: {
     Sidebar,
-    // Index,
-    New,
+    Index,
   },
 
   beforeCreate() {
