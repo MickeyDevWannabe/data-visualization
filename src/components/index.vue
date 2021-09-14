@@ -68,6 +68,15 @@
               y-axis-title="Avg. exchange rate"
             />
           </v-col>
+          <v-col cols="4">
+            <text-trend-card />
+<!--            <trend-->
+<!--              :data="[0, 2, 5, 9, 5, 10, 3, 5, 0, 0, 1, 8, 2, 9, 0]"-->
+<!--              :gradient="['#6fa8dc', '#42b983', '#2c3e50']"-->
+<!--              auto-draw-->
+<!--              smooth-->
+<!--            />-->
+          </v-col>
         </v-row>
 
         <v-row>
@@ -119,14 +128,15 @@
 import dayjs from 'dayjs';
 import { NBP, TABLE_TYPES } from '../plugins/nbp';
 import Chart from './core/charts/Chart.vue';
-import TextCard from './core/cards/TextCard.vue';
-import MultilineTextCard from './core/cards/MultilineTextCard.vue';
 import DatepickerDialog from './layout/DatepickerDialog.vue';
+import MultilineTextCard from './core/cards/MultilineTextCard.vue';
+import TextCard from './core/cards/TextCard.vue';
+import TextTrendCard from './core/cards/TextTrendCard.vue';
 
 export default {
   name: 'index',
   components: {
-    Chart, DatepickerDialog, MultilineTextCard, TextCard,
+    Chart, DatepickerDialog, MultilineTextCard, TextCard, TextTrendCard,
   },
   data: () => ({
     currencyData: null,
@@ -139,6 +149,10 @@ export default {
 
   created() {
     this.tableType = TABLE_TYPES.A;
+  },
+
+  mounted() {
+    this.fetchExchangeRatesTopCount();
   },
 
   watch: {

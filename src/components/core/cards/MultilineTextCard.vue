@@ -1,6 +1,6 @@
 <template>
-  <v-card>
-    <v-card-title>{{ title }}</v-card-title>
+  <v-card class="rounded-lg">
+    <v-card-title v-if="title">{{ title }}</v-card-title>
     <v-progress-circular
       v-if="loading"
       :indeterminate="loading"
@@ -13,14 +13,15 @@
         <v-col>
           <v-avatar
             v-if="avatar"
-            color="primary"
-            size="48"
+            class="mr-1"
+            :color="COLOR_CODES[index]"
+            size="40"
           >
             {{ index + 1 }}
           </v-avatar>
-          {{ item.code }}
+          <span class="mx-1">{{ item.code }}</span>
         </v-col>
-        <v-col>{{ item.value }}</v-col>
+        <v-col class="text-end">{{ item.value }}</v-col>
       </v-list-item>
     </v-list>
   </v-card>
@@ -39,5 +40,12 @@ export default {
     },
     title: String,
   },
+  data: () => ({
+    COLOR_CODES: {
+      0: 'success',
+      1: 'warning',
+      2: 'info',
+    },
+  }),
 };
 </script>
